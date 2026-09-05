@@ -79,9 +79,15 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+    console.log("===== USER MIDDLEWARE =====");
+    console.log("req.user:", req.user);
+
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user || null;
+
+    console.log("currUser:", res.locals.currUser);
+
     next();
 });
 
@@ -113,6 +119,8 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", {statusCode, message});
 });
 
-app.listen(8080, () => {
-    console.log("Hello from port 8080");
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
