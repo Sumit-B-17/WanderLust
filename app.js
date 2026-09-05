@@ -79,15 +79,9 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    console.log("===== USER MIDDLEWARE =====");
-    console.log("req.user:", req.user);
-
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user || null;
-
-    console.log("currUser:", res.locals.currUser);
-
     next();
 });
 
