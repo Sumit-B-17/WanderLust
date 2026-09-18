@@ -21,15 +21,16 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderLust";
-const dbUrl = process.env.MONGO_URL || process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/wanderLust';
+const MONGO_URL = "mongodb://127.0.0.1:27017/wanderLust";
+// const dbUrl = process.env.MONGO_URL || process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/wanderLust';
 
 main()
   .then(() => console.log("Database connected"))
   .catch((err) => console.log(err));
 
 async function main() {
-    await mongoose.connect(dbUrl);
+    //await mongoose.connect(dbUrl);
+    await mongoose.connect(MONGO_URL)
 };
 
 app.set("view engine", "ejs");
@@ -40,7 +41,8 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "public")));
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
+    // mongoUrl: dbUrl,
+    mongoUrl: MONGO_URL,
     crypto: {
         secret: process.env.SECRET
     },
@@ -55,7 +57,7 @@ const sessionOptions = {
     store: store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -79,9 +81,9 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+    res.locals.currUser = req.user || null;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user || null;
     next();
 });
 
@@ -106,7 +108,7 @@ app.use("/", userRouter);
 //     res.send("Success");
 // })
 
-app.all(""*"", (req, res, next) => {
+app.use((req, res, next) => {
     next(new ExpressError("Page Not Found", 404));
 });
 

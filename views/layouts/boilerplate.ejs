@@ -21,6 +21,9 @@
 </head>
 
 <body>
+    <% locals.currUser = currUser || null; %>
+    <% locals.success = success || []; %>
+    <% locals.error = error || []; %>
     <%- include("../includes/navbar.ejs") %>
 
         <div class="container">

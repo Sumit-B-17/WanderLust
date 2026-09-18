@@ -7,10 +7,10 @@ module.exports.createReview = async (req, res) => {
     let newReview = new Review(req.body.review);
     newReview.author = req.user._id;
 
-    listing.reviews.push(newReview);
-
     await newReview.save();
-    await listing.save();
+    // Use an atomic update so legacy listings with incomplete geometry can
+    // still receive reviews without revalidating every listing field.
+    await Listing.findByIdAndUpdate(id, { $push: { reviews: newReview._id } });
 
     req.flash("success", "Successfully added review");
     res.redirect(`/listings/${id}`);
